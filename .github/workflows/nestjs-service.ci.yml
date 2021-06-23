@@ -1,0 +1,50 @@
+name: nest-service.ci
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - 'services/nestjs-service/**'
+
+env:
+  SERVICE_NAME: 'nestjs-service'
+  NODE_VERSION: "14.17.0"
+
+jobs:
+  build:
+    defaults:
+      run: 
+        shell: bash
+        working-directory: 'services/nestjs-service'
+        
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: checkout to branch
+        uses: actions/checkout@v2
+
+      - name: setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: install deps
+        run: npm ci
+
+      - name: run tests
+        run: npm t
+
+      - name: build docker image
+        run: docker build -t nestjs-service:latest -f .
+
+      - name: build docker image tar file
+        run: docker save -o nestjs-service.tar nestjs-service:latest
+
+      - name: upload artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: site
+          path: nestjs-service.tar
+
+        
