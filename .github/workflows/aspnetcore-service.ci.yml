@@ -1,0 +1,47 @@
+name: aspnetcore-service.ci
+
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - 'services/aspnetcore-service/**'
+
+env:
+  SERVICE_NAME: 'aspnetcore-service'
+  DOTNET_VERSION: "5.0.301"
+
+jobs:
+  build:
+    defaults:
+      run: 
+        shell: bash
+        working-directory: 'services/aspnetcore-service'
+        
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout to branch
+        uses: actions/checkout@v2
+
+      - name: setup .NET core SDK ${{ env.DOTNET_VERSION }}
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      # add steps for testing
+
+      - name: build docker image
+        run: docker build -t aspnetcore-service:latest .
+
+      - name: build docker image tar file
+        run: docker save -o aspnetcore-service.tar aspnetcore-service:latest
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v1
+        # this is weird, the working directory wasn't respected
+        with:
+          name: aspnetcore-service
+          path: services/aspnetcore-service/aspnetcore-service.tar
+
+        

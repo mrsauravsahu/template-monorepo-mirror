@@ -1,9 +1,9 @@
-name: nest-service.ci
+name: nestjs-service.ci
 
 on:
-  push:
+  pull_request:
     branches:
-      - main
+      - develop
     paths:
       - 'services/nestjs-service/**'
 
@@ -18,7 +18,7 @@ jobs:
         shell: bash
         working-directory: 'services/nestjs-service'
         
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: checkout to branch
