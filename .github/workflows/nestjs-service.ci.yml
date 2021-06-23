@@ -3,7 +3,7 @@ name: nest-service.ci
 on:
   push:
     branches:
-      - 'improv/update-node-version-nestjs'
+      - main
     paths:
       - 'services/nestjs-service/**'
 
