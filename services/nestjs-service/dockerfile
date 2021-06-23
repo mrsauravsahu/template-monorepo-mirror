@@ -1,0 +1,31 @@
+FROM node:lts as buildEnv
+
+WORKDIR /app
+
+COPY package* .
+
+RUN npm ci
+
+COPY . .
+
+RUN npm run build
+
+FROM node:lts-alpine as finalCodeEnv
+
+WORKDIR /app
+
+COPY --from=buildEnv /app/package* .
+
+RUN npm i --prod
+
+COPY --from=buildEnv /app/dist dist
+
+FROM alpine 
+
+WORKDIR /app
+
+RUN apk add nodejs && rm -rf /var/cache/apk/*
+
+COPY --from=finalCodeEnv /app .
+
+ENTRYPOINT node .
