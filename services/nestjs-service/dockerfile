@@ -2,7 +2,7 @@ FROM node:lts as buildEnv
 
 WORKDIR /app
 
-COPY package* .
+COPY package* ./
 
 RUN npm ci
 
@@ -14,7 +14,7 @@ FROM node:lts-alpine as finalCodeEnv
 
 WORKDIR /app
 
-COPY --from=buildEnv /app/package* .
+COPY --from=buildEnv /app/package* ./
 
 RUN npm i --prod
 

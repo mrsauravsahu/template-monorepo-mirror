@@ -3,13 +3,13 @@ name: nest-service.ci
 on:
   push:
     branches:
-      - develop
+      - 'improv/update-node-version-nestjs'
     paths:
       - 'services/nestjs-service/**'
 
 env:
   SERVICE_NAME: 'nestjs-service'
-  NODE_VERSION: "14.17.0"
+  NODE_VERSION: "14.17.1"
 
 jobs:
   build:
@@ -32,19 +32,23 @@ jobs:
       - name: install deps
         run: npm ci
 
-      - name: run tests
+      - name: run unit tests
         run: npm t
 
+      - name: run e2e tests
+        run: npm run test:e2e
+
       - name: build docker image
-        run: docker build -t nestjs-service:latest -f .
+        run: docker build -t nestjs-service:latest .
 
       - name: build docker image tar file
         run: docker save -o nestjs-service.tar nestjs-service:latest
 
-      - name: upload artefact
+      - name: upload artifact
         uses: actions/upload-artifact@v1
+        # this is weird, the working directory wasn't respected
         with:
-          name: site
-          path: nestjs-service.tar
+          name: nestjs-service
+          path: services/nestjs-service/nestjs-service.tar
 
         

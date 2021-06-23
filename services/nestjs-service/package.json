@@ -1,7 +1,7 @@
 {
   "name": "@template-monorepo/nestjs-service",
   "version": "0.0.1",
-  "description": "",
+  "description": "A basic Nestjs Service",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
