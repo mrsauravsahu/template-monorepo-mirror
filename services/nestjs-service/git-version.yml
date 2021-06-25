@@ -1,5 +1,6 @@
 mode: ContinuousDeployment
-next-version: 1.0.0
+# uncomment this to get to first version
+# next-version: 1.0.0
 ignore:
   sha: []
 merge-message-formats: {}
