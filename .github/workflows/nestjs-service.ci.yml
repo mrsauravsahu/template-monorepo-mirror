@@ -9,6 +9,8 @@ on:
 
 env:
   SERVICE_NAME: 'nestjs-service'
+  HOT_BRANCH: 'refs/heads/develop'
+  COOL_BRANCH: 'refs/heads/main'
   NODE_VERSION: "14.17.1"
 
 jobs:
@@ -37,6 +39,7 @@ jobs:
           versionSpec: '5.x'
 
       - name: execute gitversion
+        id: gitversion
         uses: gittools/actions/gitversion/execute@v0.9.7
         with:
           useConfigFile: true
@@ -58,9 +61,12 @@ jobs:
         run: docker save -o nestjs-service.tar nestjs-service:latest
 
       - name: upload artifact
+        # if: ${{ github.ref == env.HOT_BRANCH }}
         uses: actions/upload-artifact@v1
         with:
           name: nestjs-service
           path: ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME) }}
 
-        
+      - name: tag the build
+        # if: ${{ github.ref == env.HOT_BRANCH }}
+        run: git tag ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }} && git push origin ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }}
