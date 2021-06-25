@@ -4,11 +4,13 @@ on:
   pull_request:
     branches:
       - develop
-    paths:
-      - 'services/nestjs-service/**'
+    # paths:
+      # - 'services/nestjs-service/**'
 
 env:
   SERVICE_NAME: 'nestjs-service'
+  HOT_BRANCH: 'refs/heads/develop'
+  COOL_BRANCH: 'refs/heads/main'
   NODE_VERSION: "14.17.1"
 
 jobs:
@@ -23,11 +25,25 @@ jobs:
     steps:
       - name: checkout to branch
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: setup node.js
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: install gitversion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: execute gitversion
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        with:
+          useConfigFile: true
+          configFilePath: ${{ format('services/{0}/git-version.yml', env.SERVICE_NAME) }}
 
       - name: install deps
         run: npm ci
@@ -45,10 +61,12 @@ jobs:
         run: docker save -o nestjs-service.tar nestjs-service:latest
 
       - name: upload artifact
+        # if: ${{ github.ref == env.HOT_BRANCH }}
         uses: actions/upload-artifact@v1
-        # this is weird, the working directory wasn't respected
         with:
           name: nestjs-service
-          path: services/nestjs-service/nestjs-service.tar
+          path: ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME) }}
 
-        
+      - name: tag the build
+        # if: ${{ github.ref == env.HOT_BRANCH }}
+        run: git tag ${{ format('services/{0}/v{1}', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }} && git push origin ${{ format('services/{0}/v{1}', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }}
