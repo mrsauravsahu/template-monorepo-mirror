@@ -69,4 +69,4 @@ jobs:
 
       - name: tag the build
         # if: ${{ github.ref == env.HOT_BRANCH }}
-        run: git tag ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }} && git push origin ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }}
+        run: git tag ${{ format('services/{0}/v{1}', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }} && git push origin ${{ format('services/{0}/v{1}', env.SERVICE_NAME, steps.gitversion.outputs.MajorMinorPatch) }}
