@@ -4,8 +4,8 @@ on:
   pull_request:
     branches:
       - develop
-    paths:
-      - 'services/nestjs-service/**'
+    # paths:
+      # - 'services/nestjs-service/**'
 
 env:
   SERVICE_NAME: 'nestjs-service'
@@ -23,11 +23,24 @@ jobs:
     steps:
       - name: checkout to branch
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: setup node.js
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
+
+      - name: install gitversion
+        uses: gittools/actions/gitversion/setup@v0.9.7
+        with:
+          versionSpec: '5.x'
+
+      - name: execute gitversion
+        uses: gittools/actions/gitversion/execute@v0.9.7
+        with:
+          useConfigFile: true
+          configFilePath: ${{ format('services/{0}/git-version.yml', env.SERVICE_NAME) }}
 
       - name: install deps
         run: npm ci
@@ -46,9 +59,8 @@ jobs:
 
       - name: upload artifact
         uses: actions/upload-artifact@v1
-        # this is weird, the working directory wasn't respected
         with:
           name: nestjs-service
-          path: services/nestjs-service/nestjs-service.tar
+          path: ${{ format('services/{0}/nestjs-service.tar', env.SERVICE_NAME) }}
 
         

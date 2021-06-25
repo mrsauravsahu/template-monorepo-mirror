@@ -1,0 +1,6 @@
+mode: ContinuousDeployment
+next-version: 1.0.0
+ignore:
+  sha: []
+merge-message-formats: {}
+tag-prefix: services/nestjs/v
